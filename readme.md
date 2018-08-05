@@ -23,6 +23,6 @@ The build management is gradle based that comes with the default libGDX project 
 
 # In-game screenshots
 
-[[../blob/master/doc/screenshot/game/0.png]]
+[](../blob/master/doc/screenshot/game/0.png)
 
 # Level-editor
