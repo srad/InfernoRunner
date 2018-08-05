@@ -23,6 +23,12 @@ The build management is gradle based that comes with the default libGDX project 
 
 # In-game screenshots
 
-[](doc/screenshot/game/0.png)
+[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/0.png)
+[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/8.png)
+[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/1.png)
+[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/2.png)
 
 # Level-editor
+
+[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/editor/1.png)
+[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/editor/2.png)
