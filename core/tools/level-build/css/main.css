@@ -1,0 +1,58 @@
+body {
+    margin: 2rem;
+}
+#container #tools > label {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    padding: 0.4rem 0.6rem 0.2rem 0.3rem;
+    display: flex;
+    margin-right: 1rem;
+    float: left;
+    line-height: 1rem;
+}
+
+#container #tools > input {
+    margin: 0.2rem;
+}
+
+#container #grid {
+    border: 1px solid lightgrey;
+    overflow: scroll;
+    user-select: none;
+}
+
+table td {
+    padding: 0;
+}
+
+table td {
+    font-size: 0.7rem;
+    cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    text-align: center;
+}
+
+input[type="number"] {
+    width: 3rem;
+    text-align: right;
+}
+
+#grid td {
+    border: 2px solid lightgray;
+}
+
+.block { background: yellow; }
+.block_animated { background: darkorange; }
+.block_physical { background: orchid; }
+.block_physical_animated { background: cyan; }
+.goal { background: steelblue; }
+.portal { background: darkgoldenrod; }
+
+.life { box-shadow: 0 0 0 3px red inset;}
+.shop { box-shadow: 0 0 0 3px limegreen inset;}
+.coffin { box-shadow: 0 0 0 3px brown inset; }
+.light { box-shadow: 0 0 0 3px lightskyblue inset;}
+.fountain { box-shadow: 0 0 0 3px blueviolet inset;}
+.tower { box-shadow: 0 0 0 3px gray inset;}

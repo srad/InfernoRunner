@@ -1,0 +1,54 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+<div class="container-fluid" id="container">
+    <div class="row mb-2">
+        <div id="tools">
+        </div>
+    </div>
+    <div id="settings" class="row mb-2">
+        <label class="form-label col-form-label col-1">x-size</label>
+        <input class="form-control col-1" id="x" min="5" type="number" value="30"/>
+
+        <label class="form-label col-form-label col-1">z-size</label>
+        <input class="form-control col-1" id="z" min="5" type="number" value="40"/>
+
+        <label class="form-label col-form-label col-1">y-height</label>
+        <input class="form-control col-1" id="y" type="number" step="0.5" value="0"/>
+        <div class="col">
+            <input class="btn btn-primary" id="draw" type="button" value="draw"/>
+            <input class="btn btn-primary" id="export" type="button" value="Export JSON"/>
+            <input class="btn btn-primary" id="load" type="file" accept=".json" value="Load JSON"/>
+            <input class="btn btn-primary" id="save" type="button" value="save"/>
+        </div>
+    </div>
+    <div id="grid" class="row">
+        <table>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="row" id="output">
+        <textarea rows="10" style="width:100%;"></textarea>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+
+</html>
