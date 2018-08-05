@@ -12,6 +12,7 @@ LibGDX based 3d platformer written in kotlin which consists of following compone
 1. JavaScript based top-view level-editor which can save JSON files and a level-reader.
 1. Resource management.
 1. Different UI-screen handling.
+1. Trading/buying system in shops.
 1. Demo how to manage different game-states for entities (StateManager).
 1. Written in kotlin and making heavy use of its lanauge features.
 
@@ -23,12 +24,13 @@ The build management is gradle based that comes with the default libGDX project 
 
 # In-game screenshots
 
-[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/0.png)
-[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/8.png)
-[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/1.png)
-[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/2.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/0.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/8.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/1.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/2.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/game/6.png)
 
 # Level-editor
 
-[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/editor/1.png)
-[](https://github.com/srad/infernorunner/raw/master/doc/screenshot/editor/2.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/editor/1.png)
+![](https://github.com/srad/infernorunner/raw/master/doc/screenshot/editor/2.png)
