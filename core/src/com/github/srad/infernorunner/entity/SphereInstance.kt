@@ -3,7 +3,7 @@ package com.github.srad.infernorunner.entity
 import com.badlogic.gdx.math.Vector3
 import com.github.srad.infernorunner.core.Resource
 
-class SphereInstance : AModelInstance(Resource.sphere) {
+class SphereInstance : AbstractModelInstance(Resource.sphere) {
     override val name = "Sphere"
 
     init {

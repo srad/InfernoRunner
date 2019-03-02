@@ -4,7 +4,7 @@ import com.github.srad.infernorunner.core.Resource
 import com.github.srad.infernorunner.entity.player.IPlayerUpdateListener
 import com.github.srad.infernorunner.entity.player.PlayerInstance
 
-class SpiderInstance : AModelInstance(Resource.spiderModel), IPlayerUpdateListener {
+class SpiderInstance : AbstractModelInstance(Resource.spiderModel), IPlayerUpdateListener {
     override val name = "Spider"
     var hitPlayer = false
 

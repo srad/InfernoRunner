@@ -11,7 +11,7 @@ import java.util.function.Supplier
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
-abstract class AModelInstance(modelResource: Resource<Model>) : ModelInstance(modelResource.load), IGameLoopListener {
+abstract class AbstractModelInstance(modelResource: Resource<Model>) : ModelInstance(modelResource.load), IGameLoopListener {
     abstract val name: String
 
     private val animators = ArrayList<IAnimator>()
@@ -28,7 +28,7 @@ abstract class AModelInstance(modelResource: Resource<Model>) : ModelInstance(mo
             transform.setTranslation(value)
         }
 
-    fun distanceTo(a: AModelInstance) = translation.sub(a.translation).len2()
+    fun distanceTo(a: AbstractModelInstance) = translation.sub(a.translation).len2()
 
     protected fun <T : IAnimator> addAnimation(klass: KClass<T>) {
         val animation = klass.primaryConstructor?.call(Supplier { animationTransform }, Consumer<Matrix4> { animationTransform = it })

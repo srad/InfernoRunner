@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.github.srad.infernorunner.core.Resource
+import com.github.srad.infernorunner.core.TextureAtlasResource
 import com.github.srad.infernorunner.core.Window
 import com.github.srad.infernorunner.entity.AbstractGameCycle
 
@@ -29,7 +30,7 @@ abstract class AbstractScreen : AbstractGameCycle(), Screen {
     protected lateinit var currentStage: AbstractStage
 
     // Created with: https://dabuttonfactory.com/
-    private val atlas: TextureAtlas by lazy { Resource(com.github.srad.infernorunner.GameConfig.buttonAtlas, TextureAtlas::class).load }
+    private val atlas: TextureAtlas by lazy { TextureAtlasResource(com.github.srad.infernorunner.GameConfig.buttonAtlas).load }
 
     private var _isVisible = false
     val isVisible get() = _isVisible

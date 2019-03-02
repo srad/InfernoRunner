@@ -25,7 +25,7 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
         }
     }
 
-    val entities = GdxArray<AModelInstance>()
+    val entities = GdxArray<AbstractModelInstance>()
 
     abstract fun implementation()
 
@@ -91,7 +91,7 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
         }
     }
 
-    fun add(entity: AModelInstance) {
+    fun add(entity: AbstractModelInstance) {
         entities.add(entity)
         entityManager.add(entity)
     }
@@ -133,7 +133,7 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
             return MapData(m, Texture(pixelMap))
         }
 
-    inline fun <reified T : AModelInstance> addModel(v: Vector3, scale: Float = 1f) {
+    inline fun <reified T : AbstractModelInstance> addModel(v: Vector3, scale: Float = 1f) {
         add(T::class.constructors.first().call().apply {
             transform.scl(scale)
             transform.setTranslation(v)

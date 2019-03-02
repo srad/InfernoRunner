@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
-import com.github.srad.infernorunner.entity.AModelInstance
+import com.github.srad.infernorunner.entity.AbstractModelInstance
 import com.github.srad.infernorunner.entity.player.IPlayerUpdateListener
 import com.github.srad.infernorunner.entity.PhysicalModelInstance
 import com.github.srad.infernorunner.entity.player.PlayerInstance
@@ -29,9 +29,9 @@ class MyContactListener(private val listener: ICollisionUserValueListener) : Con
  * One is for MyContactListener and the other for the #EntityManager.
  */
 interface ICollisionListener {
-    fun contactStarted(m1: AModelInstance, m2: AModelInstance)
-    fun contactEnded(m1: AModelInstance, m2: AModelInstance)
-    fun contactProcessed(m1: AModelInstance, m2: AModelInstance) {}
+    fun contactStarted(m1: AbstractModelInstance, m2: AbstractModelInstance)
+    fun contactEnded(m1: AbstractModelInstance, m2: AbstractModelInstance)
+    fun contactProcessed(m1: AbstractModelInstance, m2: AbstractModelInstance) {}
 }
 
 interface ICollisionUserValueListener {
@@ -40,7 +40,7 @@ interface ICollisionUserValueListener {
     fun contactProcessed(userValue0: Int, userValue1: Int) {}
 }
 
-class EntityManager : Array<AModelInstance>(), Disposable, ICollisionUserValueListener, IGameLoopListener, ILoggable {
+class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUserValueListener, IGameLoopListener, ILoggable {
     val world: btDiscreteDynamicsWorld
     val debugDrawer: DebugDrawer
     private val collisionConfig: btDefaultCollisionConfiguration
@@ -123,7 +123,7 @@ class EntityManager : Array<AModelInstance>(), Disposable, ICollisionUserValueLi
         }
     }
 
-    override fun add(entity: AModelInstance) {
+    override fun add(entity: AbstractModelInstance) {
         if (entity is PhysicalModelInstance) {
             entity.index = size
             entity.rigidBody.userValue = size

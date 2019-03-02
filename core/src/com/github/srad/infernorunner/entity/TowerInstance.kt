@@ -37,7 +37,7 @@ class TowerInstance : PhysicalModelInstance(Resource.towerModel,
         }
     }
 
-    override fun spawn(): AModelInstance {
+    override fun spawn(): AbstractModelInstance {
         val m = ProjectTileInstance()
         m.transform.setTranslation(translation.add(0f, 9f, 0f))
         m.transform.scl(0.5f)

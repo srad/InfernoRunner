@@ -7,7 +7,7 @@ import com.github.srad.infernorunner.core.Resource
 import com.github.srad.infernorunner.level.IMappable
 import com.github.srad.infernorunner.level.MapInfo
 
-class BlockInstance : AModelInstance(Resource.block2), IMappable {
+class BlockInstance : AbstractModelInstance(Resource.block2), IMappable {
     override val name = "Block-Transparent"
     override val mapInfo = MapInfo("Block", Color.ORANGE)
 

@@ -17,7 +17,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array
 import com.github.srad.infernorunner.InfernoRunner
 import com.github.srad.infernorunner.core.*
-import com.github.srad.infernorunner.entity.AModelInstance
+import com.github.srad.infernorunner.entity.AbstractModelInstance
 import com.github.srad.infernorunner.entity.CoffinInstance
 import com.github.srad.infernorunner.entity.PortalInstance
 import com.github.srad.infernorunner.entity.player.IPlayerListener
@@ -178,7 +178,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
     }
 
     private var transporting = false
-    private var nextPortal: AModelInstance? = null
+    private var nextPortal: AbstractModelInstance? = null
 
     override fun update(delta: Float) {
         super.update(delta)

@@ -5,7 +5,7 @@ import com.github.srad.infernorunner.core.Resource
 import com.github.srad.infernorunner.entity.player.IPlayerUpdateListener
 import com.github.srad.infernorunner.entity.player.PlayerInstance
 
-class ProjectTileInstance : AModelInstance(Resource.projectileModel), IPlayerUpdateListener {
+class ProjectTileInstance : AbstractModelInstance(Resource.projectileModel), IPlayerUpdateListener {
     override val name = "Projectile"
 
     var towards: Vector3? = null

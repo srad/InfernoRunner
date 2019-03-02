@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
 
 data class PhysicalAttributes(val shape: btCollisionShape, var mass: Float = 0f, val collidesWith: CollisionMasks)
 
-abstract class PhysicalModelInstance(modelResource: Resource<Model>, val physics: PhysicalAttributes) : AModelInstance(modelResource) {
+abstract class PhysicalModelInstance(modelResource: Resource<Model>, val physics: PhysicalAttributes) : AbstractModelInstance(modelResource) {
     // TODO: MotionState doesnt update model
     //private val motionState: MotionState
     protected open var syncModelWithPhysics: Boolean = true

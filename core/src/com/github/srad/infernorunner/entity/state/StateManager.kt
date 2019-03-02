@@ -1,18 +1,18 @@
 package com.github.srad.infernorunner.entity.state
 
 import com.github.srad.infernorunner.core.GameInfo
-import com.github.srad.infernorunner.entity.AModelInstance
+import com.github.srad.infernorunner.entity.AbstractModelInstance
 
-abstract class State<T : AModelInstance>(val parent: T) {
+abstract class State<T : AbstractModelInstance>(val parent: T) {
     open fun handleInput(gameInfo: GameInfo, delta: Float) {}
     open fun update(delta: Float) {}
     open fun enter() {}
     open fun exit() {}
 }
 
-class VoidState<T : AModelInstance>(parent: T) : State<T>(parent)
+class VoidState<T : AbstractModelInstance>(parent: T) : State<T>(parent)
 
-class StateManager<T : AModelInstance> {
+class StateManager<T : AbstractModelInstance> {
     private var currentStates = ArrayList<State<T>>()
     private lateinit var currentStateName: Enum<*>
     private val states = HashMap<String, ArrayList<State<T>>>()

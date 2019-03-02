@@ -195,7 +195,7 @@ class PlayerInstance(val listener: IPlayerListener) : PhysicalModelInstance(Reso
         listener.damage()
     }
 
-    override fun contactStarted(m1: AModelInstance, m2: AModelInstance) {
+    override fun contactStarted(m1: AbstractModelInstance, m2: AbstractModelInstance) {
         // Can be refactored into #EntityManager to involve specific callback, but that good enough now.
         // Keep chained, since m2 can be multiple things.
         if (m2 is IScoreGiver) {
@@ -249,7 +249,7 @@ class PlayerInstance(val listener: IPlayerListener) : PhysicalModelInstance(Reso
         }
     }
 
-    override fun contactEnded(m1: AModelInstance, m2: AModelInstance) {
+    override fun contactEnded(m1: AbstractModelInstance, m2: AbstractModelInstance) {
         if (closeToShop && (m2 is ShopInstance)) {
             closeToShop = false
         }

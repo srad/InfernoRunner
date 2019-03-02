@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 
 class MyMotionState extends btMotionState {
-    private final AModelInstance model;
+    private final AbstractModelInstance model;
 
-    public MyMotionState(AModelInstance model) {
+    public MyMotionState(AbstractModelInstance model) {
         this.model = model;
     }
 

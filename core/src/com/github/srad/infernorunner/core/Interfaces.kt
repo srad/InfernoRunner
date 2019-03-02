@@ -3,7 +3,7 @@ package com.github.srad.infernorunner.core
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
-import com.github.srad.infernorunner.entity.AModelInstance
+import com.github.srad.infernorunner.entity.AbstractModelInstance
 
 interface IGameLoopListener {
     fun create() {}
@@ -38,5 +38,5 @@ interface IHealthGiver {
 
 interface IModelSpawner {
     var spawnModel: Boolean
-    fun spawn(): AModelInstance
+    fun spawn(): AbstractModelInstance
 }

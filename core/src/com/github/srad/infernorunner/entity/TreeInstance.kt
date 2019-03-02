@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import com.github.srad.infernorunner.core.Resource
 
-class TreeInstance : AModelInstance(Resource.treeModel) {
+class TreeInstance : AbstractModelInstance(Resource.treeModel) {
     override val name = "Tree"
     var rotate = false
     private val speed = MathUtils.random(0.1f, 2f) * MathUtils.randomSign()
