@@ -9,11 +9,11 @@ import java.util.function.Supplier
  * Encapsulated animations only based on the transformation value, so this class can only
  * manipulate or read the transformation Matrix4 data of anything.
  */
-abstract class IAnimator(val transformSupplier: Supplier<Matrix4>, val transformConsumer: Consumer<Matrix4>) {
+abstract class AbstractAnimator(val transformSupplier: Supplier<Matrix4>, val transformConsumer: Consumer<Matrix4>) {
     abstract fun update(delta: Float)
 }
 
-class VerticalAnimator(transformSupplier: Supplier<Matrix4>, transformConsumer: Consumer<Matrix4>) : IAnimator(transformSupplier, transformConsumer) {
+class VerticalAnimator(transformSupplier: Supplier<Matrix4>, transformConsumer: Consumer<Matrix4>) : AbstractAnimator(transformSupplier, transformConsumer) {
     enum class AnimationState { Rising, Falling, Start }
 
     private var state = AnimationState.Start
@@ -45,7 +45,7 @@ class VerticalAnimator(transformSupplier: Supplier<Matrix4>, transformConsumer: 
     }
 }
 
-class RotationAnimation(transformSupplier: Supplier<Matrix4>, transformConsumer: Consumer<Matrix4>) : IAnimator(transformSupplier, transformConsumer) {
+class RotationAnimation(transformSupplier: Supplier<Matrix4>, transformConsumer: Consumer<Matrix4>) : AbstractAnimator(transformSupplier, transformConsumer) {
     override fun update(delta: Float) {
         transformConsumer.accept(transformSupplier.get().rotateRad(Vector3.Y, 3f * delta))
     }

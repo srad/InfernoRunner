@@ -3,7 +3,7 @@ package com.github.srad.infernorunner.entity.state
 import com.github.srad.infernorunner.core.GameInfo
 import com.github.srad.infernorunner.core.ILoggable
 import com.github.srad.infernorunner.entity.AbstractModelInstance
-import com.github.srad.infernorunner.entity.player.PlayerState
+import com.github.srad.infernorunner.entity.player.state.PlayerState
 import java.util.*
 
 abstract class State<T : AbstractModelInstance>(val parent: T) {

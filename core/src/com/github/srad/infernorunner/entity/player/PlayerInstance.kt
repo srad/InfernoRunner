@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape
 import com.badlogic.gdx.utils.Array
 import com.github.srad.infernorunner.core.*
 import com.github.srad.infernorunner.entity.*
+import com.github.srad.infernorunner.entity.player.state.*
 import com.github.srad.infernorunner.entity.state.StateManager
 import com.github.srad.infernorunner.level.IMappable
 import com.github.srad.infernorunner.level.MapInfo

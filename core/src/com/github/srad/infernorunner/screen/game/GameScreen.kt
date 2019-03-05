@@ -2,26 +2,18 @@ package com.github.srad.infernorunner.screen.game
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.Environment
-import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array
 import com.github.srad.infernorunner.InfernoRunner
 import com.github.srad.infernorunner.core.*
-import com.github.srad.infernorunner.entity.AbstractModelInstance
 import com.github.srad.infernorunner.entity.CoffinInstance
 import com.github.srad.infernorunner.entity.player.IPlayerListener
 import com.github.srad.infernorunner.entity.player.PlayerInstance
-import com.github.srad.infernorunner.entity.player.PlayerState
+import com.github.srad.infernorunner.entity.player.state.PlayerState
 import com.github.srad.infernorunner.level.AbstractLevelCreator
 import com.github.srad.infernorunner.level.LevelReader
 import com.github.srad.infernorunner.screen.AbstractScreen

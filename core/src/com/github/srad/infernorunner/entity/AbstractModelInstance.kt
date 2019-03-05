@@ -33,7 +33,7 @@ abstract class AbstractModelInstance(modelResource: Resource<Model>) : ModelInst
     val id = idCounter.incrementAndGet()
 
     /** Could be refactored into an AnimationManager class, but blooooooat. */
-    private val animators = ArrayList<IAnimator>()
+    private val animators = ArrayList<AbstractAnimator>()
     private val controllers = Array<AnimationController>()
 
     protected open var animationTransform: Matrix4
@@ -51,7 +51,7 @@ abstract class AbstractModelInstance(modelResource: Resource<Model>) : ModelInst
     /** Squared (not euclidean) distance to another model. */
     fun distanceTo(a: AbstractModelInstance) = translation.sub(a.translation).len2()
 
-    protected fun <T : IAnimator> addController(klass: KClass<T>) {
+    protected fun <T : AbstractAnimator> addController(klass: KClass<T>) {
         val animation = klass.primaryConstructor?.call(Supplier { animationTransform }, Consumer<Matrix4> { animationTransform = it })
         if (animation != null) {
             animators.add(animation)
