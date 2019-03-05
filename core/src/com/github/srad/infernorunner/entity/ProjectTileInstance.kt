@@ -34,7 +34,7 @@ class ProjectTileInstance : AbstractModelInstance(Resource.projectileModel), IPl
             if (distance!!.len2() > 0.1f) {
                 transform.translate(towards)
             } else {
-                playerInstance.addBloodStain()
+                playerInstance.applyDamage()
                 alive = false
                 remove = true
             }

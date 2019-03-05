@@ -49,7 +49,7 @@ class ShopStage(private val playerInstance: PlayerInstance, private val listener
                 if (playerInstance.score > 0) {
                     bumpSound.play()
                     playerInstance.incLive(1)
-                    playerInstance.decScore(1)
+                    playerInstance.incScore(-1)
                     listener.purchase()
                 }
                 refresh()
@@ -64,7 +64,7 @@ class ShopStage(private val playerInstance: PlayerInstance, private val listener
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 if (playerInstance.score > 0) {
                     bumpSound.play()
-                    playerInstance.decScore(1)
+                    playerInstance.incScore(-1)
                     playerInstance.removeBloodStain()
                     listener.purchase()
                 }

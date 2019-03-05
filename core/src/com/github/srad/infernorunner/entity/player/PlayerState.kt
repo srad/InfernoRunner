@@ -3,19 +3,27 @@ package com.github.srad.infernorunner.entity.player
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.TimeUtils
 import com.github.srad.infernorunner.core.GameInfo
 import com.github.srad.infernorunner.core.Resource
 import com.github.srad.infernorunner.entity.state.State
 
 enum class PlayerState {
-    Ground, Air, LevelCompleted, Dead, GameOver
+    Ground, Air, LevelCompleted, Dead, GameOver, Void, Won, LevelCompletedState, StatusState
 }
 
 class LevelCompletedState(parent: PlayerInstance) : State<PlayerInstance>(parent) {
-    override fun handleInput(gameInfo: GameInfo, delta: Float) {
+    private var levelCompleteTime = 0L
+
+    override fun enter() {
+        levelCompleteTime = TimeUtils.millis()
+        Resource.comeHere.load.play()
     }
 
     override fun update(delta: Float) {
+        if (TimeUtils.timeSinceMillis(levelCompleteTime) > 7) {
+            parent.stateManager.state = PlayerState.Ground
+        }
     }
 }
 
@@ -49,6 +57,17 @@ class MoveState(parent: PlayerInstance) : State<PlayerInstance>(parent) {
         }
         if (key.pressed(Input.Keys.RIGHT, Input.Keys.D) || control.right) {
             parent.rigidBody.translate(camDir.cpy().crs(cam.up).nor().scl(playerSettings.leftRightVelocity).scl(if (control.right) control.horizontal.scale * .5f else 1f))
+        }
+    }
+
+    override fun update(delta: Float) {
+        parent.respawn = false
+
+        parent.cam.position.set(parent.rigidBody.worldTransform.getTranslation(Vector3.Zero).cpy().add(0f, 2f, 0f))
+        parent.cam.update()
+
+        if (parent.rigidBody.worldTransform.getTranslation(Vector3.Zero).y < -30f) {
+            parent.stateManager.state = PlayerState.Dead
         }
     }
 }
@@ -95,11 +114,9 @@ class GroundState(parent: PlayerInstance) : State<PlayerInstance>(parent) {
             parent.stateManager.state = PlayerState.Air
         }
     }
-
-    override fun update(delta: Float) {
-    }
 }
 
+/** Enables mouse and joystick look-around. */
 class LookAroundState(parent: PlayerInstance) : State<PlayerInstance>(parent) {
     override fun handleInput(gameInfo: GameInfo, delta: Float) {
         val cam = parent.cam
@@ -124,8 +141,33 @@ class LookAroundState(parent: PlayerInstance) : State<PlayerInstance>(parent) {
     }
 }
 
-class DeadState(parent: PlayerInstance) : State<PlayerInstance>(parent)
+class DeadState(parent: PlayerInstance) : State<PlayerInstance>(parent) {
+    private var deathTime = 0L
+    private var isDead = false
+
+    override fun enter() {
+        isDead = false
+        parent.applyDamage()
+        deathTime = TimeUtils.millis()
+        isDead = true
+
+        parent.listener.death()
+
+        if (parent.lives > 0) {
+            parent.damage(-1)
+        }
+    }
+
+    override fun update(delta: Float) {
+        if (TimeUtils.timeSinceMillis(deathTime) < 2000) {
+            return
+        } else {
+            parent.respawn = true
+            parent.stateManager.state = PlayerState.Ground
+            Resource.screamSound.load.stop()
+        }
+    }
+}
+
 class GameOverState(parent: PlayerInstance) : State<PlayerInstance>(parent)
-class LevelCompleteState(parent: PlayerInstance) : State<PlayerInstance>(parent)
-class ReadForNextLevelState(parent: PlayerInstance) : State<PlayerInstance>(parent)
 class VoidState(parent: PlayerInstance) : State<PlayerInstance>(parent)

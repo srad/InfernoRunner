@@ -5,6 +5,10 @@ import com.badlogic.gdx.math.Vector3
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+/**
+ * Encapsulated animations only based on the transformation value, so this class can only
+ * manipulate or read the transformation Matrix4 data of anything.
+ */
 abstract class IAnimator(val transformSupplier: Supplier<Matrix4>, val transformConsumer: Consumer<Matrix4>) {
     abstract fun update(delta: Float)
 }

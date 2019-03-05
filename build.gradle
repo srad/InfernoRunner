@@ -1,6 +1,4 @@
 buildscript {
-
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -8,8 +6,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-
-
     }
 }
 
@@ -21,7 +17,7 @@ allprojects {
     ext {
         appName = "InfernoRunner"
         gdxVersion = '1.9.8'
-        roboVMVersion = '2.3.3'
+        roboVMVersion = '2.3.5'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
@@ -52,7 +48,6 @@ project(":desktop") {
 
 project(":core") {
     apply plugin: "java"
-
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"

@@ -7,11 +7,11 @@ import com.github.srad.infernorunner.entity.PhysicalModelInstance
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KClass
 
-data class Window(var width: Float = 0f, var height: Float = 0f, var midX: Float = 0f, var midY: Float = 0f)
+class Window(var width: Float = 0f, var height: Float = 0f, var midX: Float = 0f, var midY: Float = 0f)
 
 sealed class InputInfo
 
-data class MouseInfo(var screenX: Int = 0, var screenY: Int = 0, var pointer: Int = 0, var button: Int = 0, var down: Boolean = false) : InputInfo() {
+class MouseInfo(var screenX: Int = 0, var screenY: Int = 0, var pointer: Int = 0, var button: Int = 0, var down: Boolean = false) : InputInfo() {
     var vector3
         get() = Vector3(screenX.toFloat(), screenY.toFloat(), 0f)
         set(v) {
@@ -20,33 +20,33 @@ data class MouseInfo(var screenX: Int = 0, var screenY: Int = 0, var pointer: In
         }
 }
 
-data class KeyInfo(val code: IntSet = IntSet(), var down: Boolean = false) : InputInfo() {
+class KeyInfo(val code: IntSet = IntSet(), var down: Boolean = false) : InputInfo() {
     fun pressed(vararg codes: Int): Boolean = codes.any { Gdx.input.isKeyPressed(it) }
 }
 
-data class AxisInfo(var active: Boolean = false, var value: Float = 0f) : InputInfo() {
+class AxisInfo(var active: Boolean = false, var value: Float = 0f) : InputInfo() {
     val scale: Float get() = (1 + Math.abs(value))
     val scaleWithSign: Float get() = (1 + Math.abs(value)) * Math.signum(value)
 }
 
-data class AnalogStick(var horizontal: AxisInfo = AxisInfo(), var vertical: AxisInfo = AxisInfo()) {
+class AnalogStick(var horizontal: AxisInfo = AxisInfo(), var vertical: AxisInfo = AxisInfo()) {
     companion object {
         const val noise = 0.1f
-        const val AXIS_LY = 0 //-1 is up | +1 is down
-        const val AXIS_LX = 1 //-1 is left | +1 is right
-        const val AXIS_RY = 2 //-1 is up | +1 is down
-        const val AXIS_RX = 3 //-1 is left | +1 is right
+        const val AXIS_LY = 0 // -1 is up   | +1 is down
+        const val AXIS_LX = 1 // -1 is left | +1 is right
+        const val AXIS_RY = 2 // -1 is up   | +1 is down
+        const val AXIS_RX = 3 // -1 is left | +1 is right
     }
 
-    val left: Boolean get() = horizontal.active && (horizontal.value < 0f)
-    val right: Boolean get() = horizontal.active && (horizontal.value > 0f)
-    val up: Boolean get() = vertical.active && (vertical.value < 0f)
-    val down: Boolean get() = vertical.active && (vertical.value > 0f)
+    val left get() = horizontal.active && (horizontal.value < 0f)
+    val right get() = horizontal.active && (horizontal.value > 0f)
+    val up get() = vertical.active && (vertical.value < 0f)
+    val down get() = vertical.active && (vertical.value > 0f)
 
-    val isMoving: Boolean get() = left || right || up || down
+    val isMoving get() = left || right || up || down
 }
 
-data class ControllerInfo(
+class ControllerInfo(
         var connected: Boolean = false,
 
         // A standard double analog stick is expected.
@@ -99,12 +99,12 @@ class MaskInfo(val mask: Mask, private val collidesWith: CollisionMasks) {
     override fun toString() = "MaskInfo($mask, collisionMask=$collisionMask)"
 }
 
-data class GameStatistics(var jumps: AtomicInteger = AtomicInteger(0),
-                          var deaths: AtomicInteger = AtomicInteger(0),
-                          var lives: AtomicInteger = AtomicInteger(0),
-                          var purchases: AtomicInteger = AtomicInteger(0),
-                          var hits: AtomicInteger = AtomicInteger(0),
-                          var gameOvers: AtomicInteger = AtomicInteger(0)) {
+class GameStatistics(var jumps: AtomicInteger = AtomicInteger(0),
+                     var deaths: AtomicInteger = AtomicInteger(0),
+                     var lives: AtomicInteger = AtomicInteger(0),
+                     var purchases: AtomicInteger = AtomicInteger(0),
+                     var hits: AtomicInteger = AtomicInteger(0),
+                     var gameOvers: AtomicInteger = AtomicInteger(0)) {
     fun reset() {
         jumps.set(0)
         deaths.set(0)

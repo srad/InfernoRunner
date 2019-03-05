@@ -19,9 +19,9 @@ import com.github.srad.infernorunner.InfernoRunner
 import com.github.srad.infernorunner.core.*
 import com.github.srad.infernorunner.entity.AbstractModelInstance
 import com.github.srad.infernorunner.entity.CoffinInstance
-import com.github.srad.infernorunner.entity.PortalInstance
 import com.github.srad.infernorunner.entity.player.IPlayerListener
 import com.github.srad.infernorunner.entity.player.PlayerInstance
+import com.github.srad.infernorunner.entity.player.PlayerState
 import com.github.srad.infernorunner.level.AbstractLevelCreator
 import com.github.srad.infernorunner.level.LevelReader
 import com.github.srad.infernorunner.screen.AbstractScreen
@@ -43,6 +43,8 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
     private var drawModelWithDebug = true
 
     private val hellMusic: Music by lazy { Resource.hellMusic.load }
+
+    private var stageProvider: IStageProvider? = null
 
     private val playerInstance = PlayerInstance(object : IPlayerListener {
         override fun death() {
@@ -172,75 +174,44 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
             levelInfo.currentLevel += 1
         } else {
             // No more levels, won...
-            playerInstance.hasWon = true
+            playerInstance.stateManager.state = PlayerState.Won
         }
         stopped = false
     }
 
-    private var transporting = false
-    private var nextPortal: AbstractModelInstance? = null
-
     override fun update(delta: Float) {
         super.update(delta)
 
-        if (playerInstance.hasWon) {
-            showStage(winStage)
-            return
+        // TODO: Move to entity with IStageProvider implementation. Any entity should be allowed to show stages.
+        when (playerInstance.stateManager.state) {
+            PlayerState.StatusState -> showStage(infoStage)
+            PlayerState.Won -> showStage(winStage)
+            PlayerState.GameOver -> showStage(gameOverStage)
+            PlayerState.LevelCompletedState -> showStage(levelFinishedStage)
+            else -> showStage(hudStage)
         }
 
-        if (playerInstance.gameOver) {
-            showStage(gameOverStage)
-            return
-        }
-
-        if (playerInstance.readForNextLevel) {
-            showStage(levelFinishedStage)
-            return
-        }
-
-        if (!transporting && playerInstance.currentPortal != null) {
-            playerInstance.currentPortal?.sound?.play()
-            nextPortal = levelInfo.level?.entities?.firstOrNull { it is PortalInstance && it != playerInstance.currentPortal }
-            if (nextPortal != null) {
-                transporting = true
-                playerInstance.bodyTranslation = nextPortal!!.translation
-            }
-        }
-        if (transporting && playerInstance.currentPortal == null) {
-            transporting = false
-        }
-
-        // Shop-stage handles "visiting" of the player itself.
+        // TODO: Implement IStageProvider
         shopStage.update(delta)
 
         entityManager.update(delta, playerInstance)
-        entityManager.world.stepSimulation(delta, 5, 1f / 60f)
 
         if (playerInstance.respawn) {
             respawn()
         }
     }
 
-    fun addMarker(v: Vector3) {
-        val material = Material(ColorAttribute.createDiffuse(1f, .5f, .1f, 1f), ColorAttribute.createSpecular(Color.YELLOW), FloatAttribute.createShininess(5f))
-        val attributes = VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.TextureCoordinates
-        val model = ModelBuilder().createSphere(1f, 1f, 1f, 16, 16, material, attributes.toLong())
-        val mi = ModelInstance(model)
-        mi.transform.setTranslation(v)
-        debugModels.add(mi)
-    }
-
     /** Spawn at closest reached spawn point. "Reaching" happens by touching the spawn. */
     private fun respawn() {
         val closestSpawn = entityManager
-                .filter { e -> e is CoffinInstance && e.reachedByPlayer }
-                .map { e -> Pair(e, playerInstance.translation.sub(e.translation)) }
-                .sortedBy { pair -> pair.second.len() }
+                .filter { it is CoffinInstance && it.reachedByPlayer }
+                .map { Pair(it, playerInstance.translation.sub(it.translation)) }
+                .sortedBy { it.second.len2() }
                 .first()
 
         playerInstance.bodyTranslation = closestSpawn.first.translation.add(0f, 6f, 0f)
 
-        if (playerInstance.gameOver || playerInstance.hasWon) {
+        if (playerInstance.stateManager.any(PlayerState.GameOver, PlayerState.Won)) {
             showStage(hudStage)
             playerInstance.reset()
             catchCursor()
@@ -273,10 +244,17 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
     override fun handleInput(gameInfo: GameInfo, delta: Float) {
         entityManager.handleInput(gameInfo, delta)
 
-        if (gameInfo.key.pressed(Key.TAB) || gameInfo.controller.select) {
-            showStage(infoStage)
-        } else if (!playerInstance.gameOver && !playerInstance.hasWon && currentStage != hudStage && currentStage != levelFinishedStage) {
-            showStage(hudStage)
+        val statusInput = gameInfo.key.pressed(Key.TAB) || gameInfo.controller.select;
+        val inStatusState = playerInstance.stateManager.state == PlayerState.StatusState
+
+        if (inStatusState && !statusInput) {
+            playerInstance.stateManager.popState()
+            return
+        }
+
+        if (!inStatusState && statusInput) {
+            playerInstance.stateManager.pushSetState = PlayerState.StatusState
+            return
         }
 
         when {
@@ -332,7 +310,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
 
     override fun resume() {
         super.resume()
-        if (playerInstance.gameOver || playerInstance.hasWon) {
+        if (playerInstance.stateManager.any(PlayerState.GameOver, PlayerState.Won)) {
             respawn()
         }
         showStage(hudStage)

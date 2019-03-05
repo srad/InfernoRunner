@@ -2,7 +2,7 @@ package com.github.srad.infernorunner.core
 
 import com.badlogic.gdx.Gdx
 
-data class PrefType<T>(val typeName: String, val default: T, val label: String) {
+class PrefType<T>(val typeName: String, val default: T, val label: String) {
     companion object {
         // Must be lazy because objects below have be initialized first.
         val statistics by lazy { arrayOf(PrefType.PlayerJumps, PrefType.PlayerDeaths, PrefType.PlayerGameOvers, PrefType.PlayerLives, PrefType.PlayerPurchases, PrefType.PlayerHits) }
@@ -36,23 +36,23 @@ class GamePref {
 
     fun <T> set(pref: PrefType<T>, t: T) {
         when (t) {
-            is String -> preferences.putString(pref.typeName, t)
+            is String  -> preferences.putString(pref.typeName, t)
             is Boolean -> preferences.putBoolean(pref.typeName, t)
-            is Float -> preferences.putFloat(pref.typeName, t)
-            is Int -> preferences.putInteger(pref.typeName, t)
-            is Long -> preferences.putLong(pref.typeName, t)
-            else -> error("Invalid preference type $pref")
+            is Float   -> preferences.putFloat(pref.typeName, t)
+            is Int     -> preferences.putInteger(pref.typeName, t)
+            is Long    -> preferences.putLong(pref.typeName, t)
+            else       -> error("Invalid preference type $pref")
         }
         preferences.flush()
     }
 
     /** Ignore compiler warning. Casting is correctly determined already by "default" value type. */
     fun <T> get(pref: PrefType<T>): T = when (pref.default) {
-        is String -> preferences.getString(pref.typeName, pref.default)
+        is String  -> preferences.getString(pref.typeName, pref.default)
         is Boolean -> preferences.getBoolean(pref.typeName, pref.default)
-        is Float -> preferences.getFloat(pref.typeName, pref.default)
-        is Int -> preferences.getInteger(pref.typeName, pref.default)
-        is Long -> preferences.getLong(pref.typeName, pref.default)
-        else -> throw error("Cannot read unknown preference: ${pref.typeName}")
+        is Float   -> preferences.getFloat(pref.typeName, pref.default)
+        is Int     -> preferences.getInteger(pref.typeName, pref.default)
+        is Long    -> preferences.getLong(pref.typeName, pref.default)
+        else       -> throw error("Cannot read unknown preference: ${pref.typeName}")
     } as T
 }

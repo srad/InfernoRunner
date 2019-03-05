@@ -28,7 +28,7 @@ class HudStage(private val levelInfo: LevelInfo, private val playerInstance: Pla
                    |Active:    ${playerInstance.rigidBody.isActive}
                    |Respawn:    ${playerInstance.respawn}
                    |Shop:    ${playerInstance.closeToShop}
-                   |Portal:    ${playerInstance.currentPortal != null}
+                   |Portal:    ${playerInstance.currentTeleporter != null}
                    |State:    ${playerInstance.stateManager.state}""".trimMargin("|").replace("\n", "\n\n")
 
     private val hudText get() = "Level: ${levelInfo.level?.name}  /  Souls: ${playerInstance.score}"//  >  Name: ${settings.get(PrefType.PlayerName)}"

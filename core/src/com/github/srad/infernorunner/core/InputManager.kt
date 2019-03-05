@@ -6,6 +6,10 @@ import com.badlogic.gdx.controllers.ControllerListener
 import com.badlogic.gdx.controllers.PovDirection
 import com.badlogic.gdx.math.Vector3
 
+/**
+ * Combines the Keyboard and controller input into one object {@class GameInfo}
+ * for the game-engine to process.
+ */
 class InputManager : InputProcessor, ControllerListener {
     val gameInfo = GameInfo()
 
@@ -73,15 +77,17 @@ class InputManager : InputProcessor, ControllerListener {
     }
 
     override fun buttonUp(controller: Controller?, buttonCode: Int): Boolean {
-        gameInfo.controller.down = false
-        gameInfo.controller.y = false
-        gameInfo.controller.x = false
-        gameInfo.controller.a = false
-        gameInfo.controller.b = false
-        gameInfo.controller.l = false
-        gameInfo.controller.r = false
-        gameInfo.controller.start = false
-        gameInfo.controller.select = false
+        gameInfo.controller.apply {
+            down = false
+            y = false
+            x = false
+            a = false
+            b = false
+            l = false
+            r = false
+            start = false
+            select = false
+        }
         return true
     }
 
@@ -94,18 +100,21 @@ class InputManager : InputProcessor, ControllerListener {
     }
 
     override fun axisMoved(controller: Controller, axisCode: Int, value: Float): Boolean {
-        gameInfo.controller.connected = true
         val noise = AnalogStick.noise
 
-        gameInfo.controller.analogLeft.horizontal.active = Math.abs(controller.getAxis(AnalogStick.AXIS_LX)) > noise
-        gameInfo.controller.analogLeft.vertical.active = Math.abs(controller.getAxis(AnalogStick.AXIS_LY)) > noise
-        gameInfo.controller.analogRight.horizontal.active = Math.abs(controller.getAxis(AnalogStick.AXIS_RX)) > noise
-        gameInfo.controller.analogRight.vertical.active = Math.abs(controller.getAxis(AnalogStick.AXIS_RY)) > noise
+        gameInfo.controller.apply {
+            connected = true
 
-        gameInfo.controller.analogLeft.horizontal.value = controller.getAxis(AnalogStick.AXIS_LX)
-        gameInfo.controller.analogLeft.vertical.value = controller.getAxis(AnalogStick.AXIS_LY)
-        gameInfo.controller.analogRight.horizontal.value = controller.getAxis(AnalogStick.AXIS_RX)
-        gameInfo.controller.analogRight.vertical.value = controller.getAxis(AnalogStick.AXIS_RY)
+            analogLeft.horizontal.active = Math.abs(controller.getAxis(AnalogStick.AXIS_LX)) > noise
+            analogLeft.vertical.active = Math.abs(controller.getAxis(AnalogStick.AXIS_LY)) > noise
+            analogRight.horizontal.active = Math.abs(controller.getAxis(AnalogStick.AXIS_RX)) > noise
+            analogRight.vertical.active = Math.abs(controller.getAxis(AnalogStick.AXIS_RY)) > noise
+
+            analogLeft.horizontal.value = controller.getAxis(AnalogStick.AXIS_LX)
+            analogLeft.vertical.value = controller.getAxis(AnalogStick.AXIS_LY)
+            analogRight.horizontal.value = controller.getAxis(AnalogStick.AXIS_RX)
+            analogRight.vertical.value = controller.getAxis(AnalogStick.AXIS_RY)
+        }
 
         return true
     }
@@ -123,17 +132,19 @@ class InputManager : InputProcessor, ControllerListener {
     }
 
     override fun buttonDown(controller: Controller?, buttonCode: Int): Boolean {
-        gameInfo.controller.connected = true
-        gameInfo.controller.button = buttonCode
-        gameInfo.controller.down = true
-        gameInfo.controller.y = buttonCode == 3
-        gameInfo.controller.x = buttonCode == 2
-        gameInfo.controller.a = buttonCode == 0
-        gameInfo.controller.b = buttonCode == 1
-        gameInfo.controller.l = buttonCode == 4
-        gameInfo.controller.r = buttonCode == 5
-        gameInfo.controller.start = buttonCode == 7
-        gameInfo.controller.select = buttonCode == 6
+        gameInfo.controller.apply {
+            connected = true
+            button = buttonCode
+            down = true
+            y = buttonCode == 3
+            x = buttonCode == 2
+            a = buttonCode == 0
+            b = buttonCode == 1
+            l = buttonCode == 4
+            r = buttonCode == 5
+            start = buttonCode == 7
+            select = buttonCode == 6
+        }
         return true
     }
 

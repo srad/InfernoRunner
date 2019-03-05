@@ -18,7 +18,7 @@ class PhysicalBlockInstance : PhysicalModelInstance(Resource.block, PhysicalAttr
     private val speed: Float = MathUtils.random(1f, 30f)
     var rotate = false
     var startY: Float? = null
-    var animate: Boolean = false
+    var animate = false
 
     enum class AnimationState { Rising, Falling }
 

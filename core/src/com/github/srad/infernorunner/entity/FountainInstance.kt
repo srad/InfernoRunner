@@ -8,7 +8,6 @@ import com.github.srad.infernorunner.entity.player.PlayerInstance
 
 class FountainInstance : PhysicalModelInstance(Resource.fountainModel, PhysicalAttributes(btBoxShape(Vector3(2.5f, 0.8f, 2.5f)), 1f, CollisionMasks(PlayerInstance::class, PhysicalBlockInstance::class))) {
     override val name = "Fountain"
-    private val controllers = AnimationControllers()
 
     override fun transformModel() {
         transform.setTranslation(rigidBody.worldTransform.getTranslation(Vector3.Zero))
@@ -16,15 +15,10 @@ class FountainInstance : PhysicalModelInstance(Resource.fountainModel, PhysicalA
 
     init {
         transform.scl(0.03f)
-        controllers.addAnimation("Fountain.001|Fountain.001Action", this, 0.1f)
-        controllers.addAnimation("Fountain.002|Fountain.001Action", this, 0.1f)
-        controllers.addAnimation("Fountain.003|Fountain.001Action", this, 0.1f)
-        controllers.addAnimation("Fountain.004|Fountain.001Action", this, 0.1f)
-        controllers.addAnimation("Fountain.005|Fountain.001Action", this, 0.1f)
-        //println(model.animations.joinToString { it.id })
-    }
-
-    override fun update(delta: Float) {
-        controllers.update(delta)
+        addController("Fountain.001|Fountain.001Action", 0.1f)
+        addController("Fountain.002|Fountain.001Action", 0.1f)
+        addController("Fountain.003|Fountain.001Action", 0.1f)
+        addController("Fountain.004|Fountain.001Action", 0.1f)
+        addController("Fountain.005|Fountain.001Action", 0.1f)
     }
 }

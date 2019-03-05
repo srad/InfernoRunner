@@ -63,8 +63,6 @@ abstract class PhysicalModelInstance(modelResource: Resource<Model>, val physics
         //motionState.transform = this.transform
         //rigidBody.proceedToTransform(this.transform)
     }
-
-    override fun toString() = "ModelInstance(name=$name,alive=$alive,remove=$remove,index=$index)"
 }
 
 class MotionState : btMotionState() {
