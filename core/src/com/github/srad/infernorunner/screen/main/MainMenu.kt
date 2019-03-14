@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.github.srad.infernorunner.InfernoRunner
 import com.github.srad.infernorunner.core.GamePref
 import com.github.srad.infernorunner.screen.AbstractScreen
+import com.github.srad.infernorunner.screen.game.GameScreen
 import com.github.srad.infernorunner.screen.main.stage.*
 
 class MainMenu(private val game: InfernoRunner, private val settings: GamePref) : AbstractScreen() {
@@ -48,7 +49,7 @@ class MainMenu(private val game: InfernoRunner, private val settings: GamePref) 
             override fun play(level: Int) {
                 mainMenuStage.hide()
                 game.level = level
-                game.showScreen(InfernoRunner.Screen.Game)
+                game.showScreen(GameScreen::class)
             }
 
             override fun quit() {

@@ -10,24 +10,25 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.utils.Array
 import com.github.srad.infernorunner.InfernoRunner
 import com.github.srad.infernorunner.core.*
-import com.github.srad.infernorunner.entity.CoffinInstance
+import com.github.srad.infernorunner.entity.CoffinEntity
 import com.github.srad.infernorunner.entity.player.IPlayerListener
-import com.github.srad.infernorunner.entity.player.PlayerInstance
-import com.github.srad.infernorunner.entity.player.state.PlayerState
+import com.github.srad.infernorunner.entity.player.PlayerEntity
+import com.github.srad.infernorunner.entity.player.behavior.PlayerBehavior
 import com.github.srad.infernorunner.level.AbstractLevelCreator
 import com.github.srad.infernorunner.level.LevelReader
 import com.github.srad.infernorunner.screen.AbstractScreen
 import com.github.srad.infernorunner.screen.IStageListener
 import com.github.srad.infernorunner.screen.game.stage.*
+import com.github.srad.infernorunner.screen.main.MainMenu
 import com.badlogic.gdx.Input.Keys as Key
 
 class DebugModels : Array<ModelInstance>()
 
 class LevelInfo(var currentLevel: Int, var level: AbstractLevelCreator? = null)
 
-class GameScreen(private val game: InfernoRunner, private val settings: GamePref, private var level: Int) : AbstractScreen(), ILoggable {
+class GameScreen(private val game: InfernoRunner, private val settings: GamePref) : AbstractScreen(), ILoggable {
     val gameStatistics = GameStatistics()
-    val levelInfo = LevelInfo(level)
+    val levelInfo = LevelInfo(game.level)
 
     private val entityManager = EntityManager()
     private val environment = Environment()
@@ -36,9 +37,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
 
     private val hellMusic: Music by lazy { Resource.hellMusic.load }
 
-    private var stageProvider: IStageProvider? = null
-
-    private val playerInstance = PlayerInstance(object : IPlayerListener {
+    private val playerEntity = PlayerEntity(object : IPlayerListener {
         override fun death() {
             gameStatistics.deaths.incrementAndGet()
         }
@@ -62,10 +61,10 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
 
     private val debugModels = DebugModels()
 
-    private val hudStage: HudStage by lazy { HudStage(levelInfo, playerInstance, levelInfo.level!!, settings) }
+    private val hudStage: HudStage by lazy { HudStage(levelInfo, playerEntity, levelInfo.level!!, settings) }
 
     private val shopStage: ShopStage by lazy {
-        ShopStage(playerInstance, object : IShopListener {
+        ShopStage(playerEntity, object : IShopListener {
             override fun open() {
                 inputManager.clearInput()
             }
@@ -91,7 +90,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
             }
 
             override fun mainmenu() {
-                game.showScreen(InfernoRunner.Screen.MainMenu)
+                game.showScreen(MainMenu::class)
             }
 
             override fun quit() {
@@ -106,7 +105,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
                 levelInfo.currentLevel = 0
                 loadNextLevel()
                 respawn()
-                game.showScreen(InfernoRunner.Screen.MainMenu)
+                game.showScreen(MainMenu::class)
             }
 
             override fun quit() {
@@ -117,7 +116,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
     }
 
     private val levelFinishedStage: LevelFinishedStage by lazy {
-        LevelFinishedStage(playerInstance, settings, levelInfo.level!!, object : ILevelFinishedStage {
+        LevelFinishedStage(playerEntity, settings, levelInfo.level!!, object : ILevelFinishedStage {
             override fun ok() {
                 loadNextLevel()
                 showStage(hudStage)
@@ -135,11 +134,11 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
 
     override fun show() {
         super.show()
-        levelInfo.currentLevel = level
+        levelInfo.currentLevel = game.level
         hellMusic.isLooping = true
         hellMusic.play()
 
-        entityManager.add(playerInstance)
+        entityManager.add(playerEntity)
 
         catchCursor()
         Gdx.input.setCursorPosition(Gdx.graphics.width / 2, Gdx.graphics.height / 2)
@@ -159,14 +158,14 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
             entityManager.unloadWorld()
             environment.clear()
             levelInfo.level = LevelReader(file, entityManager, environment, "${levelInfo.currentLevel}")
-            levelInfo.level!!.build(playerInstance)
-            playerInstance.resetAndRetainStats()
-            playerInstance.resetRotation()
+            levelInfo.level!!.build(playerEntity)
+            playerEntity.resetAndRetainStats()
+            playerEntity.resetRotation()
             hellMusic.play()
             levelInfo.currentLevel += 1
         } else {
             // No more levels, won...
-            playerInstance.stateManager.state = PlayerState.Won
+            playerEntity.behaviorManager.behavior = PlayerBehavior.Won
         }
         stopped = false
     }
@@ -175,43 +174,38 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
         super.update(delta)
 
         // TODO: Move to entity with IStageProvider implementation. Any entity should be allowed to show stages.
-        when (playerInstance.stateManager.state) {
-            PlayerState.StatusState -> showStage(infoStage)
-            PlayerState.Won -> showStage(winStage)
-            PlayerState.GameOver -> showStage(gameOverStage)
-            PlayerState.LevelCompletedState -> showStage(levelFinishedStage)
+        when (playerEntity.behaviorManager.behavior) {
+            PlayerBehavior.StatusState -> showStage(infoStage)
+            PlayerBehavior.Won -> showStage(winStage)
+            PlayerBehavior.GameOver -> showStage(gameOverStage)
+            PlayerBehavior.LevelCompletedState -> showStage(levelFinishedStage)
             else -> showStage(hudStage)
         }
 
         // TODO: Implement IStageProvider
         shopStage.update(delta)
 
-        entityManager.update(delta, playerInstance)
-
-        if (playerInstance.respawn) {
-            respawn()
-        }
+        entityManager.update(delta, playerEntity)
     }
 
     /** Spawn at closest reached spawn point. "Reaching" happens by touching the spawn. */
     private fun respawn() {
         val closestSpawn = entityManager
-                .filter { it is CoffinInstance && it.reachedByPlayer }
-                .map { Pair(it, playerInstance.translation.sub(it.translation)) }
+                .filter { it is CoffinEntity && it.reachedByPlayer }
+                .map { Pair(it, playerEntity.translation.sub(it.translation)) }
                 .sortedBy { it.second.len2() }
                 .first()
 
-        playerInstance.bodyTranslation = closestSpawn.first.translation.add(0f, 6f, 0f)
+        playerEntity.bodyTranslation = closestSpawn.first.translation.add(0f, 6f, 0f)
 
-        if (playerInstance.stateManager.any(PlayerState.GameOver, PlayerState.Won)) {
-            showStage(hudStage)
-            playerInstance.reset()
+        if (playerEntity.behaviorManager.any(PlayerBehavior.GameOver, PlayerBehavior.Won)) {
+            playerEntity.reset()
             catchCursor()
         }
     }
 
     override fun drawDebug(window: Window, modelBatch: ModelBatch, spriteBatch: SpriteBatch) {
-        entityManager.debugDrawer.begin(playerInstance.cam)
+        entityManager.debugDrawer.begin(playerEntity.cam)
         entityManager.world.debugDrawWorld()
         entityManager.debugDrawer.end()
         hudStage.debugDraw()
@@ -222,7 +216,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         if (!enableDebugging || drawModelWithDebug) {
-            modelBatch.begin(playerInstance.cam)
+            modelBatch.begin(playerEntity.cam)
             modelBatch.render(entityManager, environment)
             modelBatch.render(debugModels, environment)
             modelBatch.end()
@@ -237,15 +231,15 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
         entityManager.handleInput(gameInfo, delta)
 
         val statusInput = gameInfo.key.pressed(Key.TAB) || gameInfo.controller.select;
-        val inStatusState = playerInstance.stateManager.state == PlayerState.StatusState
+        val inStatusState = playerEntity.behaviorManager.behavior == PlayerBehavior.StatusState
 
         if (inStatusState && !statusInput) {
-            playerInstance.stateManager.popState()
+            playerEntity.behaviorManager.popBehavior()
             return
         }
 
         if (!inStatusState && statusInput) {
-            playerInstance.stateManager.pushSetState = PlayerState.StatusState
+            playerEntity.behaviorManager.pushBehavior = PlayerBehavior.StatusState
             return
         }
 
@@ -262,7 +256,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
             }
             gameInfo.key.pressed(Key.ESCAPE) || gameInfo.controller.start -> {
                 saveStats()
-                game.showScreen(InfernoRunner.Screen.MainMenu)
+                game.showScreen(MainMenu::class)
             }
             gameInfo.key.pressed(Key.F3) -> isPaused = true
             gameInfo.key.pressed(Key.F4) -> isPaused = false
@@ -302,7 +296,7 @@ class GameScreen(private val game: InfernoRunner, private val settings: GamePref
 
     override fun resume() {
         super.resume()
-        if (playerInstance.stateManager.any(PlayerState.GameOver, PlayerState.Won)) {
+        if (playerEntity.behaviorManager.any(PlayerBehavior.GameOver, PlayerBehavior.Won)) {
             respawn()
         }
         showStage(hudStage)

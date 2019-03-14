@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.math.Vector3
-import com.github.srad.infernorunner.entity.AbstractModelInstance
+import com.github.srad.infernorunner.entity.base.AbstractEntity
 import com.github.srad.infernorunner.screen.AbstractStage
 import kotlin.reflect.KClass
 
@@ -64,11 +64,7 @@ interface ILevelFinisherProvider
 
 interface IModelSpawner {
     var spawnModel: Boolean
-    fun spawn(): AbstractModelInstance
-}
-
-interface IStageProvider {
-    var state: AbstractStage
+    fun spawn(): AbstractEntity
 }
 
 interface ITeleporter {
@@ -79,4 +75,8 @@ interface ITeleporter {
 interface ITeleportable {
     var currentTeleporter: ITeleporter?
     fun teleport(teleporter: ITeleporter)
+}
+
+interface IStageProvider {
+    var stage: AbstractStage?
 }

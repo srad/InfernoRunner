@@ -36,21 +36,21 @@ class LevelReader(private val filename: String, entityManager: EntityManager, en
                 // solid
                     "block_physical" -> addBlock(entity.x, entity.y, entity.z, true, false, false)
                     "block_physical_animated" -> addBlock(entity.x, entity.y, entity.z, true, true, false)
-                    "life" -> addModel<LifeInstance>(v.add(0f, 3f, 0f))
+                    "life" -> addModel<LifeEntity>(v.add(0f, 3f, 0f))
                     "coffin" -> {
-                        val coffinInstance = CoffinInstance()
+                        val coffinInstance = CoffinEntity()
                         coffinInstance.applyTranslation(Vector3(entity.x, entity.y + 5f, entity.z))
                         coffinInstance.applyYRotation((Math.PI / 2).toFloat())
                         add(coffinInstance)
                     }
-                    "shop" -> addModel<ShopInstance>(v.add(0f, 5f, 0f))
+                    "shop" -> addModel<ShopEntity>(v.add(0f, 5f, 0f))
                     "goal" -> {
-                        addModel<GoalInstance>(v)
-                        addModel<ShieldInstance>(v.cpy().sub(0f, 3f, 0f))
+                        addModel<GoalEntity>(v)
+                        addModel<ShieldEntity>(v.cpy().sub(0f, 3f, 0f))
                     }
-                    "portal" -> addModel<PortalInstance>(Vector3(entity.x, entity.y, entity.z))
-                    "fountain" -> addModel<FountainInstance>(v.add(0f, 5f, 0f))
-                    "tower" -> addModel<TowerInstance>(Vector3(v.add(0f, 25f, 0f)))
+                    "portal" -> addModel<PortalEntity>(Vector3(entity.x, entity.y, entity.z))
+                    "fountain" -> addModel<FountainEntity>(v.add(0f, 5f, 0f))
+                    "tower" -> addModel<TowerEntity>(Vector3(v.add(0f, 25f, 0f)))
                     else -> logError("LevelReader", "unknown-entity: $type")
                 }
                 maxX = Math.max(entity.x, maxX)
@@ -62,10 +62,10 @@ class LevelReader(private val filename: String, entityManager: EntityManager, en
         val maxCoordinate = Math.max(maxZ, maxX) + 40f
         //renderSphere(maxCoordinate, maxCoordinate)
         //addTrees(maxCoordinate - 5f, maxCoordinate)
-        addModel<SpiderInstance>(Vector3(MathUtils.random(40f, maxCoordinate), 1f, MathUtils.random(40f, maxCoordinate)))
-        addModel<GroundInstance>(Vector3(0f, -33f, 0f), 35f)
-        addModel<CrossInstance>(Vector3(0f, 60f, 0f))
-        addModel<SphereInstance>(Vector3(), 55f)
+        addModel<SpiderEntity>(Vector3(MathUtils.random(40f, maxCoordinate), 1f, MathUtils.random(40f, maxCoordinate)))
+        addModel<GroundEntity>(Vector3(0f, -33f, 0f), 35f)
+        addModel<CrossEntity>(Vector3(0f, 60f, 0f))
+        addModel<SphereEntity>(Vector3(), 55f)
 
         environment.set(ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.6f, 0.2f, .6f))
         environment.add(DirectionalLight().set(0.8f, 0.5f, 0.2f, -2f, -3f, -2f))

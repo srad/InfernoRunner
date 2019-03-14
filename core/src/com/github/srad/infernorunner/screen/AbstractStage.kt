@@ -7,15 +7,12 @@ import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Cursor
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
@@ -60,8 +57,9 @@ abstract class AbstractStage(private val listener: IStageListener? = null) : Sta
 
     private val atlas by lazy { Resource.buttonAtlas.load }
 
-    open val infoFontSize = 12
+    open val infoFontSize = 9
     open val textFontSize = 25
+    open val hudFontSize = 40
 
     protected var zoom = 0f
 
@@ -76,7 +74,7 @@ abstract class AbstractStage(private val listener: IStageListener? = null) : Sta
         parameter.size = 100
         parameter.color = Color.RED
 
-        hudFont = generateFont(gameFontGenerator, 50, Color.BLACK, true)
+        hudFont = generateFont(gameFontGenerator, hudFontSize, Color.BLACK, true)
         infoFont = generateFont(infoFontGenerator, infoFontSize, Color.WHITE, false)
         textFont = generateFont(textFontGenerator, textFontSize, Color.BLACK, true)
         style = Label.LabelStyle(hudFont, Color.WHITE)
@@ -139,7 +137,7 @@ abstract class AbstractStage(private val listener: IStageListener? = null) : Sta
         }
     }
 
-    open protected fun build() {}
+    protected open fun build() {}
     open fun drawImplementation() {}
     open fun reset() {}
     open fun debugDraw() {}
@@ -177,109 +175,3 @@ abstract class AbstractStage(private val listener: IStageListener? = null) : Sta
     }
 }
 
-/** Has a down-sliding bloodTexture background for all stages. */
-abstract class BloodyStage(private val title: String? = null, listener: IStageListener? = null) : AbstractStage(listener) {
-    protected val root = Table()
-
-    // Controller
-    private var buttonCount = 0
-    private var buttonIndex = -1
-    private var isMoving = false
-    private var selectedBtn: ImageTextButton? = null
-    private var buttonDown = false
-
-    // Animation
-    private val startOffset = 20f
-    private var slideDownOffset = startOffset
-
-    protected open val backgroundResource = Resource.bloodBackgroundCrossed
-    private lateinit var bg: Texture
-
-    protected var shader: ShaderProgram? = null
-
-    override fun build() {
-        bg = backgroundResource.load
-        viewport.update(Gdx.graphics.width, Gdx.graphics.height)
-        root.setFillParent(true)
-        root.left().top()
-        root.padTop(30f).padLeft(60f).padRight(60f).padBottom(60f)
-
-        root.row()
-        if (title != null) {
-            root.add(Label(title, style)).left().top().padBottom(20f)
-            root.row()
-        }
-
-        root.isVisible = false
-        addActor(root)
-    }
-
-    override fun drawImplementation() {
-        if (slideDownOffset < height) {
-            slideDownOffset += slideDownOffset * .15f
-        } else if (!root.isVisible) {
-            slideDownOffset = height
-            root.isVisible = true
-            bumpSound.play()
-        }
-
-        batch.begin()
-        batch.enableBlending()
-        batch.draw(bg, 0f - zoom, height - slideDownOffset - zoom, width + zoom * 2, height + zoom * 2f)
-        batch.end()
-    }
-
-    private var selectedFirstButtonOnShow = false
-
-    override fun handleInput(gameInfo: GameInfo, delta: Float) {
-        if (hasControls) {
-            if (!gameInfo.controller.analogRight.isMoving) {
-                isMoving = false
-            }
-            if (gameInfo.controller.analogRight.isMoving && !isMoving || !selectedFirstButtonOnShow) {
-                isMoving = true
-                val btns: List<ImageTextButton> = root.children
-                        .filter { c -> c is ImageTextButton }
-                        .map { c -> c as ImageTextButton }
-
-                if (btns.isNotEmpty()) {
-                    buttonCount = btns.size
-                    val lastIndex = Math.max(0, buttonIndex)
-                    val lastBtn = btns[lastIndex]
-                    lastBtn.isChecked = false
-
-                    if (gameInfo.controller.analogRight.down || gameInfo.controller.analogRight.right || !selectedFirstButtonOnShow) {
-                        buttonIndex = Math.min(buttonCount - 1, buttonIndex + 1)
-                        selectedFirstButtonOnShow = true
-                    }
-                    if (gameInfo.controller.analogRight.up || gameInfo.controller.analogRight.left) {
-                        buttonIndex = Math.max(0, buttonIndex - 1)
-                    }
-                    selectedBtn = btns[buttonIndex]
-                    selectedBtn?.isChecked = true
-                }
-            }
-
-            if (!gameInfo.controller.a) {
-                buttonDown = false
-            }
-
-            if (!buttonDown && selectedBtn != null && gameInfo.controller.a) {
-                buttonDown = true
-                selectedBtn?.listeners?.forEach { l -> (l as ClickListener).clicked(null, 0f, 0f) }
-            }
-        }
-    }
-
-    private fun uncheckButtons() = root.children
-            .filter { c -> c is ImageTextButton }
-            .map { c -> c as ImageTextButton }
-            .forEach { c -> c.isChecked = false }
-
-    override fun show() {
-        super.show()
-        uncheckButtons()
-        buttonIndex = -1
-        selectedFirstButtonOnShow = false
-    }
-}

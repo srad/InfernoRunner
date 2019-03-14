@@ -12,33 +12,33 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
-import com.github.srad.infernorunner.entity.AbstractModelInstance
-import com.github.srad.infernorunner.entity.PhysicalModelInstance
+import com.github.srad.infernorunner.entity.base.AbstractEntity
+import com.github.srad.infernorunner.entity.base.AbstractPhysicalEntity
 import com.github.srad.infernorunner.entity.player.IPlayerUpdateListener
-import com.github.srad.infernorunner.entity.player.PlayerInstance
+import com.github.srad.infernorunner.entity.player.PlayerEntity
 
-/** Would be one class with multiple inheritance in EntityManager but naahh. */
-class MyContactListener(private val listener: ICollisionUserValueListener) : ContactListener() {
-    override fun onContactStarted(userValue0: Int, userValue1: Int) = listener.contactStarted(userValue0, userValue1)
-    override fun onContactEnded(userValue0: Int, userValue1: Int) = listener.contactEnded(userValue0, userValue1)
-    override fun onContactProcessed(userValue0: Int, userValue1: Int) = listener.contactProcessed(userValue0, userValue1)
-}
-
-/** Notice that the types of these interfaces are different. One is for MyContactListener and the other for the #EntityManager. */
+/** Public physics collision interface. */
 interface ICollisionListener {
-    fun contactStarted(model: AbstractModelInstance) {}
-    fun contactEnded(model: AbstractModelInstance) {}
-    fun contactProcessed(model: AbstractModelInstance) {}
+    fun contactStarted(model: AbstractEntity) {}
+    fun contactEnded(model: AbstractEntity) {}
+    fun contactProcessed(model: AbstractEntity) {}
 }
 
-interface ICollisionUserValueListener {
+/** Bullet callback. */
+private interface ICollisionUserValueListener {
     fun contactStarted(userValue0: Int, userValue1: Int)
     fun contactEnded(userValue0: Int, userValue1: Int)
     fun contactProcessed(userValue0: Int, userValue1: Int) {}
 }
 
+private class MyContactListener(private val listener: ICollisionUserValueListener) : ContactListener() {
+    override fun onContactStarted(userValue0: Int, userValue1: Int) = listener.contactStarted(userValue0, userValue1)
+    override fun onContactEnded(userValue0: Int, userValue1: Int) = listener.contactEnded(userValue0, userValue1)
+    override fun onContactProcessed(userValue0: Int, userValue1: Int) = listener.contactProcessed(userValue0, userValue1)
+}
+
 /** Notice that the player has special handling within the game-loop, since it is not unloaded during level chage and can be listened by any entity. */
-class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUserValueListener, IGameLoopListener, ILoggable {
+class EntityManager : Array<AbstractEntity>(), Disposable, ICollisionUserValueListener, IGameLoopListener, ILoggable {
     val world: btDiscreteDynamicsWorld
     val debugDrawer: DebugDrawer
     private val collisionConfig: btDefaultCollisionConfiguration
@@ -69,7 +69,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
         }
     }
 
-    fun update(delta: Float, playerInstance: PlayerInstance) {
+    fun update(delta: Float, playerEntity: PlayerEntity) {
         val it = iterator()
         while (it.hasNext()) {
             val e = it.next()
@@ -81,7 +81,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
             }
             if (e.remove) {
                 logDebug("Removing: $e")
-                if (e is PhysicalModelInstance) {
+                if (e is AbstractPhysicalEntity) {
                     logDebug("world.removeRigidBody($e)")
                     world.removeRigidBody(e.rigidBody)
                 }
@@ -97,13 +97,13 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
                 e.update(delta)
                 // TODO: EntityManager.add actually
                 // set for each rigidbody: rigidBody.proceedToTransform(transform)
-                // But this doesn't work for PlayerInstance (but for all other models).
+                // But this doesn't work for PlayerEntity (but for all other models).
                 // Unclear why, since also other models are translated.
-                if (e is PhysicalModelInstance) {
+                if (e is AbstractPhysicalEntity) {
                     e.transformModel()
                 }
                 if (e is IPlayerUpdateListener) {
-                    e.updatePlayer(delta, playerInstance)
+                    e.updatePlayer(delta, playerEntity)
                 }
                 if (e is IModelSpawner && e.spawnModel) {
                     e.spawnModel = false
@@ -111,7 +111,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
                 }
             }
         }
-        world.stepSimulation(delta, 5, 1f / 30f)
+        world.stepSimulation(delta, 5, 1f / 60f)
     }
 
     override fun draw(window: Window, modelBatch: ModelBatch, spriteBatch: SpriteBatch) {
@@ -124,8 +124,8 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
         }
     }
 
-    override fun add(entity: AbstractModelInstance) {
-        if (entity is PhysicalModelInstance) {
+    override fun add(entity: AbstractEntity) {
+        if (entity is AbstractPhysicalEntity) {
             entity.index = size
             entity.rigidBody.userValue = size
             logDebug("EntityManager.add: $entity")
@@ -135,7 +135,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
         super.add(entity)
     }
 
-    private fun createRigidBody(entity: PhysicalModelInstance): btRigidBody {
+    private fun createRigidBody(entity: AbstractPhysicalEntity): btRigidBody {
         entity.rigidBody.collisionFlags = entity.rigidBody.collisionFlags or btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK
         entity.rigidBody.proceedToTransform(entity.transform)
         entity.rigidBody.activate(true)
@@ -153,7 +153,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
         // Any of the two colliders can implement one of those events
         val symmetricComparison = arrayOf(Pair(model1, model2), Pair(model2, model1))
 
-        symmetricComparison.forEach { pair ->
+        for (pair in symmetricComparison) {
             val m1 = pair.first
             val m2 = pair.second
 
@@ -197,7 +197,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
         val model1 = get(userValue0)
         val model2 = get(userValue1)
 
-        if (model1 is PhysicalModelInstance && model2 is PhysicalModelInstance) {
+        if (model1 is AbstractPhysicalEntity && model2 is AbstractPhysicalEntity) {
             if (model1 is ICollisionListener) {
                 (model1 as ICollisionListener).contactEnded(model2)
             }
@@ -205,7 +205,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
 
         val symmetricComparison = arrayOf(Pair(model1, model2), Pair(model2, model1))
 
-        symmetricComparison.forEach { pair ->
+        for (pair in symmetricComparison) {
             val m1 = pair.first
             val m2 = pair.second
 
@@ -219,7 +219,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
     override fun contactProcessed(userValue0: Int, userValue1: Int) {
         val m1 = get(userValue0)
         val m2 = get(userValue1)
-        if (m1 is PhysicalModelInstance && m2 is PhysicalModelInstance) {
+        if (m1 is AbstractPhysicalEntity && m2 is AbstractPhysicalEntity) {
             if (m1 is ICollisionListener) {
                 (m1 as ICollisionListener).contactProcessed(m2)
             }
@@ -228,10 +228,13 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
 
     fun unloadWorld() {
         logDebug("unloadWorld", "start")
-        forEach { entity ->
-            if (entity !is PlayerInstance) {
+        val it = iterator()
+        while (it.hasNext()) {
+            val entity = it.next()
+
+            if (entity !is PlayerEntity) {
                 try {
-                    if (entity is PhysicalModelInstance) {
+                    if (entity is AbstractPhysicalEntity) {
                         entity.rigidBody.activate(false)
                         entity.alive = false
                         world.removeRigidBody(entity.rigidBody)
@@ -241,7 +244,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
                 }
             }
         }
-        removeAll { it !is PlayerInstance }
+        removeAll { it !is PlayerEntity }
         logDebug("unloadWorld", "complete")
     }
 
@@ -250,7 +253,7 @@ class EntityManager : Array<AbstractModelInstance>(), Disposable, ICollisionUser
         while (it.hasNext()) {
             val entity = it.next()
 
-            if (entity is PhysicalModelInstance) {
+            if (entity is AbstractPhysicalEntity) {
                 logDebug("world.removeRigidBody($entity)")
                 world.removeRigidBody(entity.rigidBody)
             }

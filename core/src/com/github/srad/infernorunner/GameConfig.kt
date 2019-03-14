@@ -6,7 +6,7 @@ import java.awt.Toolkit
 
 object GameConfig : LwjglApplicationConfiguration() {
     const val rebuildAtlas = false
-    const val debug = false
+    const val debug = true
     const val buttonAtlas = "packed/ui/buttons.atlas"
 
     private val screenSize = Toolkit.getDefaultToolkit().screenSize

@@ -3,7 +3,7 @@ package com.github.srad.infernorunner.core
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.IntSet
-import com.github.srad.infernorunner.entity.PhysicalModelInstance
+import com.github.srad.infernorunner.entity.base.AbstractPhysicalEntity
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KClass
 
@@ -94,7 +94,7 @@ class CollisionMasks(vararg val masks: KClass<*>)
 
 class MaskInfo(val mask: Mask, private val collidesWith: CollisionMasks) {
     // Union of all bits is the final collision bit-mask: 0010 || 0100 -> 0110
-    val collisionMask: Mask by lazy { Mask(collidesWith.masks.fold(0) { finalMask, mask -> finalMask or PhysicalModelInstance.createMask(mask).bits }) }
+    val collisionMask: Mask by lazy { Mask(collidesWith.masks.fold(0) { finalMask, mask -> finalMask or AbstractPhysicalEntity.createMask(mask).bits }) }
 
     override fun toString() = "MaskInfo($mask, collisionMask=$collisionMask)"
 }

@@ -2,27 +2,33 @@ package com.github.srad.infernorunner.core
 
 import com.badlogic.gdx.Gdx
 
-class PrefType<T>(val typeName: String, val default: T, val label: String) {
+abstract sealed class PrefType<T>(val typeName: String, val default: T, val label: String) {
+    class StringPref(typeName: String, default: String, label: String) : PrefType<String>(typeName, default, label)
+    class IntPref(typeName: String, default: Int, label: String) : PrefType<Int>(typeName, default, label)
+    class FloatPref(typeName: String, default: Float, label: String) : PrefType<Float>(typeName, default, label)
+    class BoolPref(typeName: String, default: Boolean, label: String) : PrefType<Boolean>(typeName, default, label)
+    class LongPref(typeName: String, default: Long, label: String) : PrefType<Long>(typeName, default, label)
+
     companion object {
         // Must be lazy because objects below have be initialized first.
         val statistics by lazy { arrayOf(PrefType.PlayerJumps, PrefType.PlayerDeaths, PrefType.PlayerGameOvers, PrefType.PlayerLives, PrefType.PlayerPurchases, PrefType.PlayerHits) }
 
-        val PlayerName = PrefType("player_name", "Player", "Player Name")
-        val PlayerJumps = PrefType("player_jumps", 0, "# Jumps")
-        val PlayerDeaths = PrefType("player_deaths", 0, "# Deaths")
-        val PlayerGameOvers = PrefType("player_game_overs", 0, "# GameOvers")
-        val PlayerLives = PrefType("player_game_lives", 0, "# Lives")
-        val PlayerPurchases = PrefType("player_game_purchases", 0, "# of Purchases")
-        val PlayerHits = PrefType("player_game_hits", 0, "# of Hits")
+        val PlayerName = StringPref("player_name", "Player", "Player Name")
+        val PlayerJumps = IntPref("player_jumps", 0, "# Jumps")
+        val PlayerDeaths = IntPref("player_deaths", 0, "# Deaths")
+        val PlayerGameOvers = IntPref("player_game_overs", 0, "# GameOvers")
+        val PlayerLives = IntPref("player_game_lives", 0, "# Lives")
+        val PlayerPurchases = IntPref("player_game_purchases", 0, "# of Purchases")
+        val PlayerHits = IntPref("player_game_hits", 0, "# of Hits")
 
-        val SoundEnabled = PrefType("sound_enabled", true, "Sound Enabled")
-        val SoundVolume = PrefType("sound_volume", 1f, "Sound Volume")
-        val MusicEnabled = PrefType("music_enabled", true, "Music Enabled")
-        val MusicVolume = PrefType("music_volume", 1f, "Music Volume")
+        val SoundEnabled = BoolPref("sound_enabled", true, "Sound Enabled")
+        val SoundVolume = FloatPref("sound_volume", 1f, "Sound Volume")
+        val MusicEnabled = BoolPref("music_enabled", true, "Music Enabled")
+        val MusicVolume = FloatPref("music_volume", 1f, "Music Volume")
 
         //TODO: implement
-        val MasterVolume = PrefType("master_volume", 1f, "Master Volume")
-        val MasterEnabled = PrefType("master_enabled", true, "Master Enabled")
+        val MasterVolume = FloatPref("master_volume", 1f, "Master Volume")
+        val MasterEnabled = BoolPref("master_enabled", true, "Master Enabled")
     }
 }
 
@@ -36,23 +42,22 @@ class GamePref {
 
     fun <T> set(pref: PrefType<T>, t: T) {
         when (t) {
-            is String  -> preferences.putString(pref.typeName, t)
+            is String -> preferences.putString(pref.typeName, t)
             is Boolean -> preferences.putBoolean(pref.typeName, t)
-            is Float   -> preferences.putFloat(pref.typeName, t)
-            is Int     -> preferences.putInteger(pref.typeName, t)
-            is Long    -> preferences.putLong(pref.typeName, t)
-            else       -> error("Invalid preference type $pref")
+            is Float -> preferences.putFloat(pref.typeName, t)
+            is Int -> preferences.putInteger(pref.typeName, t)
+            is Long -> preferences.putLong(pref.typeName, t)
+            else -> error("Invalid preference type")
         }
         preferences.flush()
     }
 
     /** Ignore compiler warning. Casting is correctly determined already by "default" value type. */
-    fun <T> get(pref: PrefType<T>): T = when (pref.default) {
-        is String  -> preferences.getString(pref.typeName, pref.default)
-        is Boolean -> preferences.getBoolean(pref.typeName, pref.default)
-        is Float   -> preferences.getFloat(pref.typeName, pref.default)
-        is Int     -> preferences.getInteger(pref.typeName, pref.default)
-        is Long    -> preferences.getLong(pref.typeName, pref.default)
-        else       -> throw error("Cannot read unknown preference: ${pref.typeName}")
+    fun <T> get(pref: PrefType<T>): T = when (pref) {
+        is PrefType.StringPref -> preferences.getString(pref.typeName, pref.default)
+        is PrefType.BoolPref -> preferences.getBoolean(pref.typeName, pref.default)
+        is PrefType.FloatPref -> preferences.getFloat(pref.typeName, pref.default)
+        is PrefType.IntPref -> preferences.getInteger(pref.typeName, pref.default)
+        is PrefType.LongPref -> preferences.getLong(pref.typeName, pref.default)
     } as T
 }

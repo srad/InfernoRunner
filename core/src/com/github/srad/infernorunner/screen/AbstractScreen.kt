@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Cursor
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -14,11 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.github.srad.infernorunner.core.TextureAtlasResource
+import com.github.srad.infernorunner.core.Resource
 import com.github.srad.infernorunner.core.Window
-import com.github.srad.infernorunner.entity.AbstractGameCycle
+import com.github.srad.infernorunner.entity.base.AbstractGameLoop
 
-abstract class AbstractScreen : AbstractGameCycle(), Screen {
+abstract class AbstractScreen : AbstractGameLoop(), Screen {
     protected val stage = Stage(ScreenViewport())
 
     // https://www.dafont.com/burtons-nightmare.font
@@ -29,7 +28,7 @@ abstract class AbstractScreen : AbstractGameCycle(), Screen {
     protected lateinit var currentStage: AbstractStage
 
     // Created with: https://dabuttonfactory.com/
-    private val atlas: TextureAtlas by lazy { TextureAtlasResource(com.github.srad.infernorunner.GameConfig.buttonAtlas).load }
+    private val atlas = Resource.buttonAtlas
 
     private var _isVisible = false
 
@@ -101,10 +100,10 @@ abstract class AbstractScreen : AbstractGameCycle(), Screen {
 
         val fontButton = generator.generateFont(p)
 
-        val region = atlas.findRegion("default")
+        val region = atlas.load.findRegion("default")
         val btn = ImageTextButton(text, with(ImageTextButton.ImageTextButtonStyle()) {
-            up = TextureRegionDrawable(atlas.findRegion("default"))
-            down = TextureRegionDrawable(atlas.findRegion("default-on"))
+            up = TextureRegionDrawable(atlas.load.findRegion("default"))
+            down = TextureRegionDrawable(atlas.load.findRegion("default-on"))
             font = fontButton
             this
         })

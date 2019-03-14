@@ -14,6 +14,12 @@ import kotlin.reflect.KClass
  * As the name implies as of then it's dynamically loaded.
  */
 sealed class Resource<out T : Disposable>(private val file: String, private val type: KClass<out T>) : Disposable {
+    class TextureResource(file: String) : Resource<Texture>("image/$file", Texture::class)
+    class ModelResource(file: String) : Resource<Model>("models/$file", Model::class)
+    class MusicResource(file: String) : Resource<Music>("audio/$file", Music::class)
+    class SoundResource(file: String) : Resource<Sound>("audio/$file", Sound::class)
+    class TextureAtlasResource(file: String) : Resource<TextureAtlas>(file, TextureAtlas::class)
+
     override fun dispose() {
         Asset.manager.unload(file)
     }
@@ -40,6 +46,7 @@ sealed class Resource<out T : Disposable>(private val file: String, private val 
         }
 
         val buttonAtlas = TextureAtlasResource(com.github.srad.infernorunner.GameConfig.buttonAtlas)
+
         val creepyMusic = MusicResource("creepy.mp3")
         val theme1 = MusicResource("music_theme_1.mp3")
         val theme2 = MusicResource("music_theme_2.mp3")
@@ -81,22 +88,16 @@ sealed class Resource<out T : Disposable>(private val file: String, private val 
         val projectileModel = ModelResource("projectile/projectile.g3db")
 
         val satanFace = TextureResource("texture/satan-face.png")
-        val hudTexture = TextureResource("ui/blood-hud-3.png")
+        val hudTexture = TextureResource("ui/blood-hud-2.png")
         val bloodTexture = TextureResource("texture/blood1.png")
         val startBackground = TextureResource("texture/bg-blood.png")
         val bloodBackground = TextureResource("texture/bg-blood-plain.png")
         val bloodBackgroundCrossed = TextureResource("texture/bg-blood-plain-crossed.png")
         val startBackgroundBump = TextureResource("texture/bg-blood-bump.png")
-        val lifeTexture = TextureResource("ui/life.png")
+        val lifeTexture = TextureResource("ui/life2.png")
         val satanEndTexture = TextureResource("texture/satan-end.png")
         val satanEndBumpTexture = TextureResource("texture/satan-end-bump.png")
         val satanOverlay = TextureResource("texture/satan-overlay-4.png")
         val ouija = TextureResource("texture/ouija.png")
     }
 }
-
-class TextureResource(file: String) : Resource<Texture>("image/$file", Texture::class)
-class ModelResource(file: String) : Resource<Model>("models/$file", Model::class)
-class MusicResource(file: String) : Resource<Music>("audio/$file", Music::class)
-class SoundResource(file: String) : Resource<Sound>("audio/$file", Sound::class)
-class TextureAtlasResource(file: String) : Resource<TextureAtlas>(file, TextureAtlas::class)

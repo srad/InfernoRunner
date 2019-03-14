@@ -9,7 +9,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.github.srad.infernorunner.core.EntityManager
 import com.github.srad.infernorunner.entity.*
-import com.github.srad.infernorunner.entity.player.PlayerInstance
+import com.github.srad.infernorunner.entity.base.AbstractEntity
+import com.github.srad.infernorunner.entity.player.PlayerEntity
 import com.badlogic.gdx.utils.Array as GdxArray
 
 abstract class AbstractLevelCreator(private val entityManager: EntityManager, val environment: Environment, val name: String) {
@@ -25,21 +26,21 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
         }
     }
 
-    val entities = GdxArray<AbstractModelInstance>()
+    val entities = GdxArray<AbstractEntity>()
 
     abstract fun implementation()
 
-    fun build(playerInstance: PlayerInstance) {
+    fun build(playerEntity: PlayerEntity) {
         implementation()
         // Mark closest spawn as start.
         val startSpawn = entityManager
-                .filter { e -> e is CoffinInstance }
-                .map { e -> Pair(e, playerInstance.translation.sub(e.translation)) }
+                .filter { e -> e is CoffinEntity }
+                .map { e -> Pair(e, playerEntity.translation.sub(e.translation)) }
                 .sortedBy { pair -> pair.second.len() }
-                .first().first as CoffinInstance
+                .first().first as CoffinEntity
 
         startSpawn.reachedByPlayer = true
-        playerInstance.rigidBody.worldTransform = startSpawn.transform.cpy().translate(1f, 6f, 0f)
+        playerEntity.rigidBody.worldTransform = startSpawn.transform.cpy().translate(1f, 6f, 0f)
     }
 
     protected fun renderSphere(minRadius: Float = 65f, maxRadius: Float = 75f) {
@@ -69,7 +70,7 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
             val x = Math.cos(rad.toDouble()) * r
             val z = Math.sin(rad.toDouble()) * r
             val v = Vector3(x.toFloat(), MathUtils.random(-30f, 15f), z.toFloat())
-            addModel<TreeInstance>(v)
+            addModel<TreeEntity>(v)
             addBlock(v.x, v.y, v.z, false, false, false, false)
             rad += MathUtils.PI / MathUtils.random(8f, 16f)
         }
@@ -77,21 +78,21 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
 
     protected fun addBlock(x: Float, y: Float, z: Float, addWithPhysics: Boolean, animate: Boolean, rotate: Boolean, drawOnMap: Boolean = true) {
         if (addWithPhysics) {
-            val b1 = PhysicalBlockInstance()
+            val b1 = PhysicalBlockEntity()
             b1.animate = animate
             b1.rotate = rotate
             b1.transform.setTranslation(Vector3(x, y, z))
             b1.mapInfo.draw = drawOnMap
             add(b1)
         } else {
-            val b2 = BlockInstance()
+            val b2 = BlockEntity()
             b2.transform.setTranslation(Vector3(x, y, z))
             b2.mapInfo.draw = drawOnMap
             add(b2)
         }
     }
 
-    fun add(entity: AbstractModelInstance) {
+    fun add(entity: AbstractEntity) {
         entities.add(entity)
         entityManager.add(entity)
     }
@@ -133,7 +134,7 @@ abstract class AbstractLevelCreator(private val entityManager: EntityManager, va
             return MapData(m, Texture(pixelMap))
         }
 
-    inline fun <reified T : AbstractModelInstance> addModel(v: Vector3, scale: Float = 1f) {
+    inline fun <reified T : AbstractEntity> addModel(v: Vector3, scale: Float = 1f) {
         add(T::class.constructors.first().call().apply {
             transform.scl(scale)
             transform.setTranslation(v)
